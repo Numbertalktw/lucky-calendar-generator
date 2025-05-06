@@ -78,21 +78,22 @@ for d in days:
 
 
 
-    data.append({
+        data.append({
         "日期": d.strftime("%Y-%m-%d"),
         "主日數": main_number,
         "主日名稱": meaning.get("名稱", ""),
         "指引": meaning.get("指引", ""),
         "運勢指數": meaning.get("星", ""),
-      "流年": f"{flowing_year} / {lifepath}",
-"流月": f"{flowing_month} / {(birthday.month % 9 or 9)}",
-"流日": f"{flowing_day} / {(birthday.day % 9 or 9)}",
-      "幸運色": "紅色",
+        "流年": f"{flowing_year} / {(birthday.year % 9 or 9)}",
+        "流月": f"{flowing_month} / {(birthday.month % 9 or 9)}",
+        "流日": f"{flowing_day} / {(birthday.day % 9 or 9)}",
+        "幸運色": "紅色",
         "水晶": "石榴石",
         "幸運小物": "💎"
     })
 
-df = pd.DataFrame(data)
+df = pd.DataFrame(data)  # ← 這裡請頂格，不要縮排
+
 
 
 
