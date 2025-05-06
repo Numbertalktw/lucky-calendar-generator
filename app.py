@@ -59,40 +59,45 @@ if st.button("🎉 生成日曆"):
     days = pd.date_range(start=datetime.date(target_year, target_month, 1),
                      end=datetime.date(target_year, target_month, 28))
 
-data = []
-for d in days:
-    # 主日數：流日
-    main_number = d.day % 9 if d.day % 9 != 0 else 9
-    meaning = day_meaning.get(main_number, {})
+    data = []
+    for d in days:
+        # 主日數計算（流日）
+        main_number = d.day % 9 if d.day % 9 != 0 else 9
+        meaning = day_meaning.get(main_number, {})
 
-        # 流年計算（以生日為主；若當年生日尚未到，使用前一年）
-    birth_md = (birthday.month, birthday.day)
-    target_md = (d.month, d.day)
-    ref_year = d.year - 1 if target_md < birth_md else d.year
-    lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
-    lifepath = lifepath % 9 or 9
+        # 流年計算（以生日為主；未過生日用前年）
+        birth_md = (birthday.month, birthday.day)
+        target_md = (d.month, d.day)
+        ref_year = d.year - 1 if target_md < birth_md else d.year
+        lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
+        lifepath = lifepath % 9 or 9
+        flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
+        flowing_month = ((d.month - birthday.month + 9) % 9) or 9
+        flowing_day = ((d.day - birthday.day + 9) % 9) or 9
 
-    flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
-    flowing_month = ((d.month - birthday.month + 9) % 9) or 9
-    flowing_day = ((d.day - birthday.day + 9) % 9) or 9
+        data.append({
+            "日期": d.strftime("%Y-%m-%d"),
+            "主日數": main_number,
+            "主日名稱": meaning.get("名稱", ""),
+            "指引": meaning.get("指引", ""),
+            "運勢指數": meaning.get("星", ""),
+            "流年": f"{flowing_year} / ({birthday.year % 9 or 9})",
+            "流月": f"{flowing_month} / ({birthday.month % 9 or 9})",
+            "流日": f"{flowing_day} / ({birthday.day % 9 or 9})",
+            "幸運色": "紅色",
+            "水晶": "石榴石",
+            "幸運小物": "🔷"
+        })
 
-    data.append({
-    "日期": d.strftime("%Y-%m-%d"),
-    "主日數": main_number,
-    "主日名稱": meaning.get("名稱", ""),
-    "指引": meaning.get("指引", ""),
-    "運勢指數": meaning.get("星", ""),
-    "流年": f"{flowing_year} / {(birthday.year % 9 or 9)}",
-    "流月": f"{flowing_month} / {(birthday.month % 9 or 9)}",
-    "流日": f"{flowing_day} / {(birthday.day % 9 or 9)}",
-    "幸運色": "紅色",
-    "水晶": "石榴石",
-    "幸運小物": "💎"
- })
+    df = pd.DataFrame(data)
+    st.dataframe(df)
 
-df = pd.DataFrame(data)  # ← 這裡請頂格，不要縮排
-
-
+    # 下載 Excel
+    from io import BytesIO
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name="流年月曆")
+    st.download_button("📥 下載 Excel", data=output.getvalue(), file_name="流年月曆.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
     data = pd.DataFrame({
@@ -110,9 +115,4 @@ df = pd.DataFrame(data)  # ← 這裡請頂格，不要縮排
 
     
 
-    # 下載 Excel
-    from io import BytesIO
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        data.to_excel(writer, index=False, sheet_name="流年月曆")
-    st.download_button("📥 下載 Excel", data=output.getvalue(), file_name="流年月曆.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+   
