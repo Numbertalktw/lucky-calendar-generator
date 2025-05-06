@@ -1,8 +1,8 @@
-import calendar
 import streamlit as st
 import datetime
 import pandas as pd
 from io import BytesIO
+import calendar
 
 # 主日數對應資料
 day_meaning = {
@@ -17,7 +17,7 @@ day_meaning = {
     9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
 
-# 幸運資訊對應
+# 主日數對應的幸運顏色與物件
 lucky_map = {
     1: {"色": "紅色", "水晶": "紅瑪瑙", "小物": "🖊️"},
     2: {"色": "粉紅色", "水晶": "粉晶", "小物": "💌"},
@@ -51,17 +51,15 @@ target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 if st.button("🎉 生成日曆"):
     st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
 
-    # 取得該月的最後一天
-_, last_day = calendar.monthrange(target_year, target_month)
-days = pd.date_range(
-    start=datetime.date(target_year, target_month, 1),
-    end=datetime.date(target_year, target_month, last_day)
-)
-
+    # 自動抓當月最後一天
+    _, last_day = calendar.monthrange(target_year, target_month)
+    days = pd.date_range(
+        start=datetime.date(target_year, target_month, 1),
+        end=datetime.date(target_year, target_month, last_day)
+    )
 
     data = []
     for d in days:
-        # 主日數
         main_number = d.day % 9 if d.day % 9 != 0 else 9
         meaning = day_meaning.get(main_number, {})
         lucky = lucky_map.get(main_number, {})
@@ -95,17 +93,14 @@ days = pd.date_range(
             "幸運小物": lucky.get("小物", "")
         })
 
-    # 顯示資料表
     df = pd.DataFrame(data)
     st.dataframe(df)
 
-    # 匯出 Excel
+    # 下載 Excel
     output = BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name="流年月曆")
-    st.download_button(
-        "📥 下載 Excel",
-        data=output.getvalue(),
-        file_name="流年月曆.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    st.download_button("📥 下載 Excel", data=output.getvalue(),
+                       file_name="流年月曆.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
