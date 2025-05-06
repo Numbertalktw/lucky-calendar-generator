@@ -1,4 +1,4 @@
-
+import calendar
 import streamlit as st
 import datetime
 import pandas as pd
@@ -51,10 +51,14 @@ target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 if st.button("🎉 生成日曆"):
     st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
 
-    # 建立該月的每日日期
-    days = pd.date_range(
-        start=datetime.date(target_year, target_month, 1),
-        end=datetime.date(target_year, target_month, 28)
+    # 取得該月的最後一天
+_, last_day = calendar.monthrange(target_year, target_month)
+
+days = pd.date_range(
+    start=datetime.date(target_year, target_month, 1),
+    end=datetime.date(target_year, target_month, last_day)
+)
+
     )
 
     data = []
