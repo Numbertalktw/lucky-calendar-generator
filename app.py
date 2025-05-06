@@ -65,17 +65,17 @@ for d in days:
     main_number = d.day % 9 if d.day % 9 != 0 else 9
     meaning = day_meaning.get(main_number, {})
 
-    # 流年計算（以生日為主，若當年生日尚未到，使用前一年）
+        # 流年計算（以生日為主；若當年生日尚未到，使用前一年）
     birth_md = (birthday.month, birthday.day)
     target_md = (d.month, d.day)
     ref_year = d.year - 1 if target_md < birth_md else d.year
     lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
-lifepath = lifepath % 9 or 9
-
+    lifepath = lifepath % 9 or 9
 
     flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
     flowing_month = ((d.month - birthday.month + 9) % 9) or 9
-flowing_day = ((d.day - birthday.day + 9) % 9) or 9
+    flowing_day = ((d.day - birthday.day + 9) % 9) or 9
+
 
 
     data.append({
