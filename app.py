@@ -58,7 +58,6 @@ days = pd.date_range(
     end=datetime.date(target_year, target_month, last_day)
 )
 
-    )
 
     data = []
     for d in days:
