@@ -19,6 +19,18 @@ day_meaning = {
     9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
 
+lucky_map = {
+    1: {"色": "紅色", "水晶": "紅瑪瑙", "小物": "🖊️"},
+    2: {"色": "粉紅色", "水晶": "粉晶", "小物": "💌"},
+    3: {"色": "橙色", "水晶": "太陽石", "小物": "🎤"},
+    4: {"色": "棕色", "水晶": "茶晶", "小物": "📦"},
+    5: {"色": "黃色", "水晶": "黃水晶", "小物": "🧭"},
+    6: {"色": "綠色", "水晶": "綠幽靈", "小物": "💗"},
+    7: {"色": "藍色", "水晶": "青金石", "小物": "📖"},
+    8: {"色": "紫色", "水晶": "紫水晶", "小物": "🏆"},
+    9: {"色": "白色", "水晶": "白水晶", "小物": "🕊️"},
+}
+
 # 主日數對應顏色
 color_map = {
     1: "紅色",
@@ -78,19 +90,22 @@ if st.button("🎉 生成日曆"):
         flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
         flowing_day_final = flowing_day_mid % 9 or 9
 
-        data.append({
-            "日期": d.strftime("%Y-%m-%d"),
-            "主日數": main_number,
-            "主日名稱": meaning.get("名稱", ""),
-            "指引": meaning.get("指引", ""),
-            "運勢指數": meaning.get("星", ""),
-            "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}",
-            "流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}",
-            "流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}",
-            "幸運色": color_map.get(main_number, ""),
-            "水晶": "石榴石",
-            "幸運小物": "🔷"
-        })
+        lucky = lucky_map.get(main_number, {})
+
+data.append({
+    "日期": d.strftime("%Y-%m-%d"),
+    "主日數": main_number,
+    "主日名稱": meaning.get("名稱", ""),
+    "指引": meaning.get("指引", ""),
+    "運勢指數": meaning.get("星", ""),
+    "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}",
+    "流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}",
+    "流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}",
+    "幸運色": lucky.get("色", ""),
+    "水晶": lucky.get("水晶", ""),
+    "幸運小物": lucky.get("小物", "")
+})
+
 
     df = pd.DataFrame(data)
     st.dataframe(df)
