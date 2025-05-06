@@ -26,7 +26,27 @@ if st.button("🎉 生成日曆"):
 
     # 以下為示範資料
     days = pd.date_range(start=datetime.date(target_year, target_month, 1),
-                         end=datetime.date(target_year, target_month, 28))
+                     end=datetime.date(target_year, target_month, 28))
+
+data = []
+for d in days:
+    main_number = d.day % 9 if d.day % 9 != 0 else 9
+    meaning = day_meaning.get(main_number, {})
+    data.append({
+        "日期": d.strftime("%Y-%m-%d"),
+        "主日數": main_number,
+        "主日名稱": meaning.get("名稱", ""),
+        "指引": meaning.get("指引", ""),
+        "運勢指數": meaning.get("星", ""),
+        "幸運色": "紅色",  # 可替換為動態邏輯
+        "水晶": "石榴石",
+        "幸運小物": "💎",
+    })
+
+df = pd.DataFrame(data)
+st.dataframe(df)
+
+
     data = pd.DataFrame({
         "日期": days,
         "主日數": [i.day % 9 + 1 for i in days],
