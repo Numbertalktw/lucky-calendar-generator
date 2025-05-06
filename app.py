@@ -51,7 +51,7 @@ target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 if st.button("🎉 生成日曆"):
     st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
 
-    # 自動抓當月最後一天
+    # 正確取得當月天數
     _, last_day = calendar.monthrange(target_year, target_month)
     days = pd.date_range(
         start=datetime.date(target_year, target_month, 1),
@@ -67,17 +67,17 @@ if st.button("🎉 生成日曆"):
         # 流年：查詢年 + 出生月日
         flowing_year_sum = sum(int(x) for x in f"{d.year}{birthday.month:02}{birthday.day:02}")
         flowing_year_mid = sum(int(x) for x in str(flowing_year_sum))
-        flowing_year_final = flowing_year_mid % 9 or 9
+        flowing_year_final = sum(int(x) for x in str(flowing_year_mid)) % 9 or 9
 
         # 流月：出生年 + 查詢月 + 出生日
         flowing_month_sum = sum(int(x) for x in f"{birthday.year}{d.month:02}{birthday.day:02}")
         flowing_month_mid = sum(int(x) for x in str(flowing_month_sum))
-        flowing_month_final = flowing_month_mid % 9 or 9
+        flowing_month_final = sum(int(x) for x in str(flowing_month_mid)) % 9 or 9
 
         # 流日：出生年 + 出生月 + 查詢日
         flowing_day_sum = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
         flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
-        flowing_day_final = flowing_day_mid % 9 or 9
+        flowing_day_final = sum(int(x) for x in str(flowing_day_mid)) % 9 or 9
 
         data.append({
             "日期": d.strftime("%Y-%m-%d"),
@@ -103,4 +103,3 @@ if st.button("🎉 生成日曆"):
     st.download_button("📥 下載 Excel", data=output.getvalue(),
                        file_name="流年月曆.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
