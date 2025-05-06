@@ -2,7 +2,9 @@
 import streamlit as st
 import datetime
 import pandas as pd
+from io import BytesIO
 
+# 主日數對應資料表
 day_meaning = {
     1: {"名稱": "創造日", "指引": "展現創意，展現自我魅力。", "星": "⭐⭐⭐⭐"},
     2: {"名稱": "連結日", "指引": "適合合作、溝通與等待機會。", "星": "⭐⭐"},
@@ -15,27 +17,8 @@ day_meaning = {
     9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
 
-data = []
-for d in days:
-    main_number = d.day % 9 if d.day % 9 != 0 else 9
-    meaning = day_meaning.get(main_number, {})
-    data.append({
-        "日期": d.strftime("%Y-%m-%d"),
-        "主日數": main_number,
-        "主日名稱": meaning.get("名稱", ""),
-        "指引": meaning.get("指引", ""),
-        "運勢指數": meaning.get("星", ""),
-        "幸運色": "紅色",
-        "水晶": "石榴石",
-        "幸運小物": "💎"
-    })
-
-df = pd.DataFrame(data)
-
-
-
+# 網頁設定
 st.set_page_config(page_title="流年月曆生成器", layout="centered")
-
 st.title("🗓️ 流年月曆生成器")
 st.markdown("請輸入你的生日與要查看的月份，系統將產出整月的流日對照表")
 
@@ -47,30 +30,34 @@ birthday = st.date_input(
     max_value=datetime.date.today()
 )
 
-
 # 年月選擇
 target_year = st.number_input("請輸入年份", min_value=1900, max_value=2100, value=2025)
 target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 
+# 生成按鈕
 if st.button("🎉 生成日曆"):
     st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
 
-    # 以下為示範資料
+    # 建立月份內的所有日期
     days = pd.date_range(start=datetime.date(target_year, target_month, 1),
-                     end=datetime.date(target_year, target_month, 28))
+                         end=datetime.date(target_year, target_month, 28))
 
     data = []
     for d in days:
-        # 主日數計算（流日）
+        # 主日數（流日）
         main_number = d.day % 9 if d.day % 9 != 0 else 9
         meaning = day_meaning.get(main_number, {})
 
-        # 流年計算（以生日為主；未過生日用前年）
+        # 流年計算（生日未到用前年）
         birth_md = (birthday.month, birthday.day)
         target_md = (d.month, d.day)
         ref_year = d.year - 1 if target_md < birth_md else d.year
+
+        # 生命靈數
         lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
         lifepath = lifepath % 9 or 9
+
+        # 流年/月/日
         flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
         flowing_month = ((d.month - birthday.month + 9) % 9) or 9
         flowing_day = ((d.day - birthday.day + 9) % 9) or 9
@@ -89,30 +76,13 @@ if st.button("🎉 生成日曆"):
             "幸運小物": "🔷"
         })
 
+    # 顯示結果
     df = pd.DataFrame(data)
     st.dataframe(df)
 
-    # 下載 Excel
-    from io import BytesIO
+    # 匯出 Excel
     output = BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name="流年月曆")
     st.download_button("📥 下載 Excel", data=output.getvalue(), file_name="流年月曆.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-
-    data = pd.DataFrame({
-        "日期": days,
-        "主日數": [i.day % 9 + 1 for i in days],
-        "主日名稱": ["創造" if i.day % 9 + 1 == 1 else "其他" for i in days],
-        "運勢指數": ["⭐️⭐️⭐️" for _ in days],
-        "指引": ["相信自己" for _ in days],
-        "幸運色": ["紅色" for _ in days],
-        "水晶": ["石榴石" for _ in days],
-        "幸運小物": ["💎" for _ in days],
-    })
-
-    st.dataframe(data)
-
-    
-
-   
