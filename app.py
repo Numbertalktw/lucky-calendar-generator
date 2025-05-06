@@ -19,6 +19,19 @@ day_meaning = {
     9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
 
+# 主日數對應顏色
+color_map = {
+    1: "紅色",
+    2: "粉紅色",
+    3: "橙色",
+    4: "棕色",
+    5: "黃色",
+    6: "綠色",
+    7: "藍色",
+    8: "紫色",
+    9: "白色",
+}
+
 # UI 設定
 st.set_page_config(page_title="流年月曆生成器", layout="centered")
 st.title("🗓️ 流年月曆生成器")
@@ -74,7 +87,7 @@ if st.button("🎉 生成日曆"):
             "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}",
             "流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}",
             "流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}",
-            "幸運色": "紅色",
+            "幸運色": color_map.get(main_number, ""),
             "水晶": "石榴石",
             "幸運小物": "🔷"
         })
