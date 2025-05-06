@@ -3,18 +3,35 @@ import streamlit as st
 import datetime
 import pandas as pd
 
-# 主日數對應的名稱、指引、星星數
 day_meaning = {
-    1: {"名稱": "創造日", "指引": "發揮行動力，啟動新的計畫與方向", "星": "⭐️⭐️⭐️⭐️"},
-    2: {"名稱": "連結日", "指引": "傾聽與合作，建立支持與情感連結", "星": "⭐️⭐️⭐️"},
-    3: {"名稱": "表達日", "指引": "敞開心扉，用創意傳達你的想法", "星": "⭐️⭐️⭐️⭐️"},
-    4: {"名稱": "建構日", "指引": "紮實前行，適合組織與落實任務", "星": "⭐️⭐️⭐️"},
-    5: {"名稱": "流動日", "指引": "擁抱改變，為生活注入新鮮與冒險", "星": "⭐️⭐️⭐️⭐️⭐️"},
-    6: {"名稱": "關懷日", "指引": "照顧他人也別忘了照顧自己", "星": "⭐️⭐️⭐️⭐️"},
-    7: {"名稱": "覺察日", "指引": "適合靜心內觀，釐清內在的方向與焦點", "星": "⭐️⭐️"},
-    8: {"名稱": "成就日", "指引": "專注在資源與目標，放膽展現實力", "星": "⭐️⭐️⭐️⭐️"},
-    9: {"名稱": "圓滿日", "指引": "放下執著，為下一個階段做準備", "星": "⭐️⭐️⭐️"},
+    1: {"名稱": "創造日", "指引": "展現創意，展現自我魅力。", "星": "⭐⭐⭐⭐"},
+    2: {"名稱": "連結日", "指引": "適合合作、溝通與等待機會。", "星": "⭐⭐"},
+    3: {"名稱": "表達日", "指引": "表達想法，展現自我魅力。", "星": "⭐⭐⭐"},
+    4: {"名稱": "實作日", "指引": "建立基礎，適合細節與規劃。", "星": "⭐⭐⭐"},
+    5: {"名稱": "行動日", "指引": "啟動新的計畫，做出主動選擇。", "星": "⭐⭐⭐⭐"},
+    6: {"名稱": "關係日", "指引": "接觸愛情，適當調整。", "星": "⭐⭐⭐"},
+    7: {"名稱": "內省日", "指引": "適合學習、休息與自我對話。", "星": "⭐"},
+    8: {"名稱": "成果日", "指引": "聚焦目標與務成就。", "星": "⭐⭐⭐⭐"},
+    9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
+
+data = []
+for d in days:
+    main_number = d.day % 9 if d.day % 9 != 0 else 9
+    meaning = day_meaning.get(main_number, {})
+    data.append({
+        "日期": d.strftime("%Y-%m-%d"),
+        "主日數": main_number,
+        "主日名稱": meaning.get("名稱", ""),
+        "指引": meaning.get("指引", ""),
+        "運勢指數": meaning.get("星", ""),
+        "幸運色": "紅色",
+        "水晶": "石榴石",
+        "幸運小物": "💎"
+    })
+
+df = pd.DataFrame(data)
+
 
 
 st.set_page_config(page_title="流年月曆生成器", layout="centered")
@@ -44,21 +61,39 @@ if st.button("🎉 生成日曆"):
 
 data = []
 for d in days:
+    # 主日數：流日
     main_number = d.day % 9 if d.day % 9 != 0 else 9
     meaning = day_meaning.get(main_number, {})
+
+    # 流年計算（以生日為主，若當年生日尚未到，使用前一年）
+    birth_md = (birthday.month, birthday.day)
+    target_md = (d.month, d.day)
+    ref_year = d.year - 1 if target_md < birth_md else d.year
+    lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
+lifepath = lifepath % 9 or 9
+
+
+    flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
+    flowing_month = ((d.month - birthday.month + 9) % 9) or 9
+flowing_day = ((d.day - birthday.day + 9) % 9) or 9
+
+
     data.append({
         "日期": d.strftime("%Y-%m-%d"),
         "主日數": main_number,
         "主日名稱": meaning.get("名稱", ""),
         "指引": meaning.get("指引", ""),
         "運勢指數": meaning.get("星", ""),
-        "幸運色": "紅色",  # 可替換為動態邏輯
+      "流年": f"{flowing_year} / {lifepath}",
+"流月": f"{flowing_month} / {(birthday.month % 9 or 9)}",
+"流日": f"{flowing_day} / {(birthday.day % 9 or 9)}",
+      "幸運色": "紅色",
         "水晶": "石榴石",
-        "幸運小物": "💎",
+        "幸運小物": "💎"
     })
 
 df = pd.DataFrame(data)
-st.dataframe(df)
+
 
 
     data = pd.DataFrame({
