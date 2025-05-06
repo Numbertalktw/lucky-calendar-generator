@@ -10,6 +10,8 @@ st.markdown("請輸入你的生日與要查看的月份，系統將產出整月�
 
 # 生日輸入
 birthday = st.date_input("請輸入你的生日", value=datetime.date(1990, 1, 1))
+  min_value=datetime.date(1900, 1, 1),
+    max_value=datetime.date.today()
 
 # 年月選擇
 target_year = st.number_input("請輸入年份", min_value=1900, max_value=2100, value=2025)
