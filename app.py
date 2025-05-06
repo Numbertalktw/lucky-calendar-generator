@@ -53,7 +53,6 @@ if st.button("🎉 生成日曆"):
 
     # 取得該月的最後一天
 _, last_day = calendar.monthrange(target_year, target_month)
-
 days = pd.date_range(
     start=datetime.date(target_year, target_month, 1),
     end=datetime.date(target_year, target_month, last_day)
