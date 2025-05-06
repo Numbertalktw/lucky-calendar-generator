@@ -71,9 +71,7 @@ flowing_day_sum = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day
 flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
 flowing_day_final = flowing_day_mid % 9 or 9
 flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
-        flowing_month = ((d.month - birthday.month + 9) % 9) or 9
-        flowing_day = ((d.day - birthday.day + 9) % 9) or 9
-
+        
         data.append({
             "日期": d.strftime("%Y-%m-%d"),
             "主日數": main_number,
