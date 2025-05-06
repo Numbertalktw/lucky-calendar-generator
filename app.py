@@ -56,7 +56,21 @@ if st.button("🎉 生成日曆"):
         ref_year = d.year - 1 if target_md < birth_md else d.year
         lifepath = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{birthday.day:02}")
         lifepath = lifepath % 9 or 9
-        flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
+        # 流年組合數（查詢年 + 出生月日）
+flowing_year_sum = sum(int(x) for x in f"{d.year}{birthday.month:02}{birthday.day:02}")
+flowing_year_mid = sum(int(x) for x in str(flowing_year_sum))
+flowing_year_final = flowing_year_mid % 9 or 9
+
+# 流月組合數（出生年 + 查詢月 + 出生日）
+flowing_month_sum = sum(int(x) for x in f"{birthday.year}{d.month:02}{birthday.day:02}")
+flowing_month_mid = sum(int(x) for x in str(flowing_month_sum))
+flowing_month_final = flowing_month_mid % 9 or 9
+
+# 流日組合數（出生年 + 出生月 + 查詢日）
+flowing_day_sum = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
+flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
+flowing_day_final = flowing_day_mid % 9 or 9
+flowing_year = (ref_year - birthday.year + lifepath) % 9 or 9
         flowing_month = ((d.month - birthday.month + 9) % 9) or 9
         flowing_day = ((d.day - birthday.day + 9) % 9) or 9
 
@@ -66,9 +80,9 @@ if st.button("🎉 生成日曆"):
             "主日名稱": meaning.get("名稱", ""),
             "指引": meaning.get("指引", ""),
             "運勢指數": meaning.get("星", ""),
-            "流年": f"{flowing_year} / ({birthday.year % 9 or 9})",
-            "流月": f"{flowing_month} / ({birthday.month % 9 or 9})",
-            "流日": f"{flowing_day} / ({birthday.day % 9 or 9})",
+           "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}",
+"流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}",
+"流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}",
             "幸運色": "紅色",
             "水晶": "石榴石",
             "幸運小物": "🔷"
