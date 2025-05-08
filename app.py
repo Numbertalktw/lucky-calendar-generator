@@ -17,7 +17,7 @@ day_meaning = {
     9: {"名稱": "釋放日", "指引": "放手，療癒與完成階段。", "星": "⭐⭐"},
 }
 
-# 主日數對應的幸運顏色與物件
+# 主日數對應的幸運色與小物
 lucky_map = {
     1: {"色": "紅色", "水晶": "紅瑪瑙", "小物": "🖊️"},
     2: {"色": "粉紅色", "水晶": "粉晶", "小物": "💌"},
@@ -30,51 +30,55 @@ lucky_map = {
     9: {"色": "白色", "水晶": "白水晶", "小物": "🕊️"},
 }
 
+# 補助函式：加總到個位數
+def reduce_to_digit(n):
+    while n > 9:
+        n = sum(int(x) for x in str(n))
+    return n
+
 # UI 設定
 st.set_page_config(page_title="流年月曆生成器", layout="centered")
 st.title("🗓️ 流年月曆生成器")
 st.markdown("請輸入你的生日與要查看的月份，系統將產出整月的流日對照表")
 
 # 生日輸入
-birthday = st.date_input(
-    "請輸入你的生日",
-    value=datetime.date(1990, 1, 1),
-    min_value=datetime.date(1900, 1, 1),
-    max_value=datetime.date.today()
-)
+birthday = st.date_input("請輸入你的生日", value=datetime.date(1990, 1, 1),
+                         min_value=datetime.date(1900, 1, 1),
+                         max_value=datetime.date.today())
 
 # 年月輸入
 target_year = st.number_input("請輸入年份", min_value=1900, max_value=2100, value=2025)
 target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 
-# 生成日曆
+# 點擊生成
 if st.button("🎉 生成日曆"):
     st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
 
-    # 正確取得當月天數
+    # 計算該月最後一天
     _, last_day = calendar.monthrange(target_year, target_month)
     days = pd.date_range(
         start=datetime.date(target_year, target_month, 1),
         end=datetime.date(target_year, target_month, last_day)
     )
-def reduce_to_digit(n):
-    while n > 9:
-        n = sum(int(x) for x in str(n))
-    return n
 
     data = []
     for d in days:
+        # 主日數
         main_number = d.day % 9 if d.day % 9 != 0 else 9
         meaning = day_meaning.get(main_number, {})
         lucky = lucky_map.get(main_number, {})
 
-        # 流年：查詢年 + 出生月日
-        flowing_year_sum = sum(int(x) for x in f"{d.year}{birthday.month:02}{birthday.day:02}")
+        # 流年：查詢年 + 出生月日（生日未過則使用前年）
+        ref_year = d.year - 1 if (d.month, d.day) < (birthday.month, birthday.day) else d.year
+        flowing_year_sum = sum(int(x) for x in f"{ref_year}{birthday.month:02}{birthday.day:02}")
         flowing_year_mid = sum(int(x) for x in str(flowing_year_sum))
         flowing_year_final = reduce_to_digit(flowing_year_mid) if flowing_year_mid > 9 else flowing_year_mid
-        
-        # 流月：出生年 + 查詢月 + 出生日
-        flowing_month_sum = sum(int(x) for x in f"{birthday.year}{d.month:02}{birthday.day:02}")
+
+        # 流月：出生年 + 查詢月 + 出生日（若未過生日日則視為上個月）
+        ref_month = d.month - 1 if d.day < birthday.day else d.month
+        ref_year_for_month = d.year if ref_month > 0 else d.year - 1
+        ref_month = 12 if ref_month == 0 else ref_month
+        flowing_month_sum = sum(int(x) for x in f"{birthday.year}{ref_month:02}{birthday.day:02}")
         flowing_month_mid = sum(int(x) for x in str(flowing_month_sum))
         flowing_month_final = reduce_to_digit(flowing_month_mid) if flowing_month_mid > 9 else flowing_month_mid
 
@@ -82,16 +86,16 @@ def reduce_to_digit(n):
         flowing_day_sum = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
         flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
         flowing_day_final = reduce_to_digit(flowing_day_mid) if flowing_day_mid > 9 else flowing_day_mid
-        
+
         data.append({
             "日期": d.strftime("%Y-%m-%d"),
             "主日數": main_number,
             "主日名稱": meaning.get("名稱", ""),
             "指引": meaning.get("指引", ""),
             "運勢指數": meaning.get("星", ""),
-            "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}",
-            "流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}",
-            "流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}",
+            "流年": f"{flowing_year_sum}/{flowing_year_mid}/{flowing_year_final}" if flowing_year_mid > 9 else f"{flowing_year_sum}/{flowing_year_mid}",
+            "流月": f"{flowing_month_sum}/{flowing_month_mid}/{flowing_month_final}" if flowing_month_mid > 9 else f"{flowing_month_sum}/{flowing_month_mid}",
+            "流日": f"{flowing_day_sum}/{flowing_day_mid}/{flowing_day_final}" if flowing_day_mid > 9 else f"{flowing_day_sum}/{flowing_day_mid}",
             "幸運色": lucky.get("色", ""),
             "水晶": lucky.get("水晶", ""),
             "幸運小物": lucky.get("小物", "")
@@ -100,20 +104,13 @@ def reduce_to_digit(n):
     df = pd.DataFrame(data)
     st.dataframe(df)
 
-    # 下載 Excel
-    import base64
-
-# 將 DataFrame 存成 Excel 並轉為 base64 編碼
-output = BytesIO()
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    df.to_excel(writer, index=False, sheet_name="流年月曆")
-excel_data = output.getvalue()
-b64 = base64.b64encode(excel_data).decode()
-
-# 動態生成檔名與顯示文字
-filename = f"LuckyCalendar_{target_year}_{target_month:02}.xlsx"
-display_name = f"📥 點此下載 {target_year} 年 {target_month} 月靈數流日建議表（三層加總斜線版）"
-
-# 建立 HTML 超連結
-href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{filename}">{display_name}</a>'
-st.markdown(href, unsafe_allow_html=True)
+    # 匯出 Excel（含錯誤檢查）
+    if not df.empty:
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="流年月曆")
+        st.download_button("📥 下載 Excel", data=output.getvalue(),
+                           file_name="流年月曆.xlsx",
+                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    else:
+        st.error("⚠️ 無法匯出 Excel：目前資料為空，請確認邏輯或輸入設定。")
