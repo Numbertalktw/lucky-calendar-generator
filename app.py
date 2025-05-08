@@ -52,7 +52,12 @@ target_month = st.selectbox("請選擇月份", list(range(1, 13)))
 
 # 點擊生成
 if st.button("🎉 生成日曆"):
-    st.success(f"生日：{birthday}｜目標月份：{target_year} 年 {target_month} 月")
+    if not birthday or not target_year or not target_month:
+        st.error("⚠️ 請確認已輸入生日與查詢的年月")
+    else:
+        st.success(f"✅ 已成功產生日曆資料：{target_year} 年 {target_month} 月")
+        # 👇 原本的邏輯可以放在這之下
+
 
     # 計算該月最後一天
     _, last_day = calendar.monthrange(target_year, target_month)
