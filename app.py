@@ -97,9 +97,19 @@ if st.button("🎉 生成日曆"):
     st.dataframe(df)
 
     # 下載 Excel
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name="流年月曆")
-    st.download_button("📥 下載 Excel", data=output.getvalue(),
-                       file_name="流年月曆.xlsx",
-                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    import base64
+
+# 將 DataFrame 存成 Excel 並轉為 base64 編碼
+output = BytesIO()
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
+    df.to_excel(writer, index=False, sheet_name="流年月曆")
+excel_data = output.getvalue()
+b64 = base64.b64encode(excel_data).decode()
+
+# 動態生成檔名與顯示文字
+filename = f"LuckyCalendar_{target_year}_{target_month:02}.xlsx"
+display_name = f"📥 點此下載 {target_year} 年 {target_month} 月靈數流日建議表（三層加總斜線版）"
+
+# 建立 HTML 超連結
+href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{filename}">{display_name}</a>'
+st.markdown(href, unsafe_allow_html=True)
