@@ -95,7 +95,7 @@ if st.button("🎉 生成日曆"):
     st.dataframe(df)
 
     # 匯出 Excel（含空檢查）
-    if not df.empty:
+    if isinstance(df, pd.DataFrame) and not df.empty and df.dropna(how='all').shape[0] > 0:
         output = BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
             df.to_excel(writer, index=False, sheet_name="流年月曆")
