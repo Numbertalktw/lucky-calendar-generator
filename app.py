@@ -57,6 +57,10 @@ if st.button("🎉 生成日曆"):
         start=datetime.date(target_year, target_month, 1),
         end=datetime.date(target_year, target_month, last_day)
     )
+def reduce_to_digit(n):
+    while n > 9:
+        n = sum(int(x) for x in str(n))
+    return n
 
     data = []
     for d in days:
@@ -67,18 +71,18 @@ if st.button("🎉 生成日曆"):
         # 流年：查詢年 + 出生月日
         flowing_year_sum = sum(int(x) for x in f"{d.year}{birthday.month:02}{birthday.day:02}")
         flowing_year_mid = sum(int(x) for x in str(flowing_year_sum))
-        flowing_year_final = sum(int(x) for x in str(flowing_year_mid)) % 9 or 9
-
+        flowing_year_final = reduce_to_digit(flowing_year_mid) if flowing_year_mid > 9 else flowing_year_mid
+        
         # 流月：出生年 + 查詢月 + 出生日
         flowing_month_sum = sum(int(x) for x in f"{birthday.year}{d.month:02}{birthday.day:02}")
         flowing_month_mid = sum(int(x) for x in str(flowing_month_sum))
-        flowing_month_final = sum(int(x) for x in str(flowing_month_mid)) % 9 or 9
+        flowing_month_final = reduce_to_digit(flowing_month_mid) if flowing_month_mid > 9 else flowing_month_mid
 
         # 流日：出生年 + 出生月 + 查詢日
         flowing_day_sum = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
         flowing_day_mid = sum(int(x) for x in str(flowing_day_sum))
-        flowing_day_final = sum(int(x) for x in str(flowing_day_mid)) % 9 or 9
-
+        flowing_day_final = reduce_to_digit(flowing_day_mid) if flowing_day_mid > 9 else flowing_day_mid
+        
         data.append({
             "日期": d.strftime("%Y-%m-%d"),
             "主日數": main_number,
