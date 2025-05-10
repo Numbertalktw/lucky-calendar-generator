@@ -8,8 +8,11 @@ st.set_page_config(page_title="LuckyCalendar - 樂覺製所", layout="centered")
 
 # 品牌標題與標語
 st.title("🌟 樂覺製所生命靈數")
-st.markdown("在數字之中，我們與自己不期而遇。  
-**Be true, be you — 讓靈魂，自在呼吸。**")
+st.markdown("""
+在數字之中，我們與自己不期而遇。  
+Be true, be you — 讓靈魂自在呼吸。
+""")
+
 
 # 使用者輸入
 birthday = st.date_input("請輸入生日", value=datetime.date(1990, 1, 1))
