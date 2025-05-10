@@ -15,7 +15,12 @@ Be true, be you — 讓靈魂自在呼吸。
 
 
 # 使用者輸入
-birthday = st.date_input("請輸入生日", value=datetime.date(1990, 1, 1))
+birthday = st.date_input(
+    "請輸入你的生日",
+    value=datetime.date(1990, 1, 1),
+    min_value=datetime.date(1900, 1, 1),  # ✅ 加上這一行
+    max_value=datetime.date.today()
+)
 target_year = st.number_input("請輸入年份", min_value=1900, max_value=2100, value=datetime.datetime.now().year)
 target_month = st.selectbox("請選擇月份", list(range(1, 13)), index=datetime.datetime.now().month - 1)
 
