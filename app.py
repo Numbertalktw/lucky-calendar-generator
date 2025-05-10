@@ -77,11 +77,15 @@ if st.button("🎉 產生日曆建議表"):
         fy_total = sum(int(x) for x in f"{year_ref}{birthday.month:02}{birthday.day:02}")
         flowing_year = format_layers(fy_total)
 
-        # 流月邏輯
-        month_ref = get_flowing_month_ref(d, birthday)
-        month_ref = 12 if month_ref == 0 else month_ref
-        fm_total = sum(int(x) for x in f"{birthday.year}{month_ref:02}{birthday.day:02}")
-        flowing_month = format_layers(fm_total)
+        # 流日邏輯（包含主日數作為流日主數）
+        fd_total = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
+        fd_mid = sum(int(x) for x in str(fd_total))
+        fd_final = reduce_to_digit(fd_mid) if fd_mid > 9 else fd_mid
+        flowing_day = f"{fd_total}/{fd_mid}/{fd_final}" if fd_mid > 9 else f"{fd_total}/{fd_mid}"
+
+        # 改為使用流日的主數作為主日數
+        main_number = fd_final
+
 
         # 流日邏輯
         fd_total = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
