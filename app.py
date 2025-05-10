@@ -59,8 +59,9 @@ def format_layers(total):
     mid = sum(int(x) for x in str(total))
     return f"{total}/{mid}/{reduce_to_digit(mid)}" if mid > 9 else f"{total}/{mid}"
 
-def get_flowing_year_ref(query_date, birthday):
-    bday = datetime.date(query_date.year, birthday.month, birthday.day)
+def get_flowing_year_ref(query_date, bday):
+    # 先確保兩者都是 datetime.date 格式
+    query_date = query_date.date() if hasattr(query_date, 'date') else query_date
     return query_date.year - 1 if query_date < bday else query_date.year
 
 def get_flowing_month_ref(query_date, birthday):
