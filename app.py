@@ -82,10 +82,21 @@ if st.button("🎉 產生日曆建議表"):
         fy_total = sum(int(x) for x in f"{year_ref}{birthday.month:02}{birthday.day:02}")
         flowing_year = format_layers(fy_total)
 
-        # 流月
-        fm_ref = get_flowing_month_ref(d, birthday)
-        fm_total = sum(int(x) for x in f"{birthday.year}{fm_ref:02}{birthday.day:02}")
-        flowing_month = format_layers(fm_total)
+        # ===== 流月 =====
+fm_ref = get_flowing_month_ref(d, birthday)
+
+# 如果月份減到 0，自動補為 12，並將年份減 1
+fm_month = fm_ref if fm_ref >= 1 else 12
+fm_year = birthday.year if fm_ref >= 1 else birthday.year - 1
+
+# 安全性檢查（1～12）
+if not 1 <= fm_month <= 12:
+    st.error(f"⚠️ 無效的流月月份：{fm_month}，請檢查計算邏輯")
+    continue
+
+fm_total = sum(int(x) for x in f"{fm_year}{fm_month:02}{birthday.day:02}")
+flowing_month = format_layers(fm_total)
+
 
         data.append({
             "日期": d.strftime("%Y-%m-%d"),
