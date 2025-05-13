@@ -105,16 +105,22 @@ if st.button("🎉 產生日曆建議表"):
     df = pd.DataFrame(data)
     st.dataframe(df)
 
-    # 匯出 Excel
-    if not df.empty:
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df.to_excel(writer, index=False, sheet_name="流年月曆")
-        st.download_button(
-            f"📥 點此下載 {target_year} 年 {target_month} 月靈數流日建議表（三層加總斜線版）",
-            data=output.getvalue(),
-            file_name=f"LuckyCalendar_{target_year}_{target_month:02}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    else:
-        st.warning("⚠️ 無法匯出 Excel：目前資料為空，請先產生日曆資料")
+    # 將年份與月份補 0 命名
+file_name = f"LuckyCalendar_{target_year}_{str(target_month).zfill(2)}.xlsx"
+title = "樂覺製所生命靈數"
+subtitle = "在數字之中，我們與自己不期而遇。Be true, be you — 讓靈魂，自在呼吸。"
+
+if not df.empty and df.dropna(how='all').shape[0] > 0:
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="流年月曆")
+    st.markdown(f"### {title}")
+    st.markdown(f"**{subtitle}**")
+    st.download_button(
+        "📥 點此下載 " + file_name.replace(".xlsx", " 年靈數流日建議表（三層加總斜線版）"),
+        data=output.getvalue(),
+        file_name=file_name,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+else:
+    st.warning("⚠️ 無法匯出 Excel：目前資料為空，請先產生日曆資料")
