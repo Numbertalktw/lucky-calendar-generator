@@ -41,37 +41,36 @@ def format_layers(total):
 
 def get_flowing_year_ref(query_date, bday):
     query_date = query_date.date() if hasattr(query_date, "date") else query_date
-    return query_date.year - 1 if query_date < datetime.date(query_date.year, bday.month, bday.day) else query_date.year
+    cutoff = datetime.date(query_date.year, bday.month, bday.day)
+    return query_date.year - 1 if query_date < cutoff else query_date.year
 
 def get_flowing_month_ref(query_date, birthday):
     query_date = query_date.date() if hasattr(query_date, "date") else query_date
-    q_month = query_date.month
-    b_month = birthday.month
-    b_day = birthday.day
-    if query_date.day < b_day:
-        q_month -= 1
-    return q_month if q_month >= 1 else 12
+    if query_date.day < birthday.day:
+        return query_date.month - 1 if query_date.month > 1 else 12
+    return query_date.month
 
-# ===== Streamlit 介面 =====
+# ===== Streamlit UI =====
 st.set_page_config(page_title="樂覺製所生命靈數", layout="centered")
 st.title("🧭 樂覺製所生命靈數")
-st.markdown("在數字之中，\n我們與自己不期而遇。  \n**Be true, be you — 讓靈魂，自在呼吸。**")
+st.markdown("在數字之中，  \n我們與自己不期而遇。  \n**Be true, be you — 讓靈魂，自在呼吸。**")
 
 # ===== 使用者輸入 =====
 birthday = st.date_input("請輸入生日", value=datetime.date(1990, 1, 1), min_value=datetime.date(1900, 1, 1))
 target_year = st.number_input("請選擇年份", min_value=1900, max_value=2100, value=datetime.datetime.now().year)
 target_month = st.selectbox("請選擇月份", list(range(1, 13)), index=datetime.datetime.now().month - 1)
 
-# ===== 生成按鈕 =====
+# ===== 產生日曆 =====
 if st.button("🎉 產生日曆建議表"):
-    # 計算該月天數
-    last_day = (datetime.date(target_year, target_month % 12 + 1, 1) - datetime.timedelta(days=1)).day
+
+    # 建立當月日列表
+    _, last_day = calendar.monthrange(target_year, target_month)
     days = pd.date_range(start=datetime.date(target_year, target_month, 1),
                          end=datetime.date(target_year, target_month, last_day))
 
     data = []
     for d in days:
-        # 主日數以流日最終值為主
+        # 流日
         fd_total = sum(int(x) for x in f"{birthday.year}{birthday.month:02}{d.day:02}")
         flowing_day = format_layers(fd_total)
         main_number = reduce_to_digit(fd_total)
@@ -84,8 +83,8 @@ if st.button("🎉 產生日曆建議表"):
         flowing_year = format_layers(fy_total)
 
         # 流月
-        flowing_month_ref = get_flowing_month_ref(d, birthday)
-        fm_total = sum(int(x) for x in f"{birthday.year}{flowing_month_ref:02}{birthday.day:02}")
+        fm_ref = get_flowing_month_ref(d, birthday)
+        fm_total = sum(int(x) for x in f"{birthday.year}{fm_ref:02}{birthday.day:02}")
         flowing_month = format_layers(fm_total)
 
         data.append({
@@ -105,22 +104,22 @@ if st.button("🎉 產生日曆建議表"):
     df = pd.DataFrame(data)
     st.dataframe(df)
 
-    # 將年份與月份補 0 命名
-file_name = f"LuckyCalendar_{target_year}_{str(target_month).zfill(2)}.xlsx"
-title = "樂覺製所生命靈數"
-subtitle = "在數字之中，我們與自己不期而遇。Be true, be you — 讓靈魂，自在呼吸。"
+    # 匯出 Excel 檔案
+    file_name = f"LuckyCalendar_{target_year}_{str(target_month).zfill(2)}.xlsx"
+    title = "樂覺製所生命靈數"
+    subtitle = "在數字之中，我們與自己不期而遇。Be true, be you — 讓靈魂，自在呼吸。"
 
-if not df.empty and df.dropna(how='all').shape[0] > 0:
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="流年月曆")
-    st.markdown(f"### {title}")
-    st.markdown(f"**{subtitle}**")
-    st.download_button(
-        "📥 點此下載 " + file_name.replace(".xlsx", " 年靈數流日建議表（三層加總斜線版）"),
-        data=output.getvalue(),
-        file_name=file_name,
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-else:
-    st.warning("⚠️ 無法匯出 Excel：目前資料為空，請先產生日曆資料")
+    if not df.empty and df.dropna(how='all').shape[0] > 0:
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="流年月曆")
+        st.markdown(f"### {title}")
+        st.markdown(f"**{subtitle}**")
+        st.download_button(
+            "📥 點此下載 " + file_name.replace(".xlsx", " 年靈數流日建議表（三層加總斜線版）"),
+            data=output.getvalue(),
+            file_name=file_name,
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    else:
+        st.warning("⚠️ 無法匯出 Excel：目前資料為空，請先產生日曆資料")
