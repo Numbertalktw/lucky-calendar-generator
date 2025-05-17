@@ -122,14 +122,11 @@ if st.button("🎉 產生日曆建議表"):
         flowing_month = format_layers(fm_total)
 
         data.append({
-            "日期": d.strftime("%Y-%m-%d"),
-            "主日數": main_number,
-            "主日名稱": meaning.get("名稱", ""),
-            "指引": guidance,
-            "運勢指數": meaning.get("星", ""),
             "流年": flowing_year,
             "流月": flowing_month,
             "流日": flowing_day,
+            "運勢指數": meaning.get("星", ""),
+            "指引": guidance,
             "幸運色": lucky.get("色", ""),
             "水晶": lucky.get("水晶", ""),
             "幸運小物": lucky.get("小物", "")
