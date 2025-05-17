@@ -93,6 +93,7 @@ def style_excel(df):
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
         header_alignment = Alignment(horizontal="center", vertical="center")
 
+        # 調整欄位寬度
         for col in worksheet.columns:
             max_length = 0
             for cell in col:
@@ -101,7 +102,7 @@ def style_excel(df):
                         max_length = len(cell.value)
                 except:
                     pass
-            adjusted_width = (max_length + 2)
+            adjusted_width = max(max_length + 5, 20)  # 增加最小寬度，防止過小
             worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
 
         # 設定標題樣式
