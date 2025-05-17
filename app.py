@@ -77,12 +77,11 @@ if st.button("🎉 產生日曆建議表"):
         meaning = day_meaning.get(main_number, {})
         lucky = lucky_map.get(main_number, {})
 
-        # 補充指引（根據流日的不同組合來提供額外的指引）
-        # 假設流日為14/5, 41/5, 23/5, 32/5等不同組合
+        # 合併補充指引到主要指引中
         if main_number == 5:
-            additional_guidance = "根據數字1和數字4的指引，今天可以專注於創意與行動的平衡，為新計畫鋪路。"
+            guidance = f"{meaning.get('指引', '')} 根據數字1和數字4的指引，今天可以專注於創意與行動的平衡，為新計畫鋪路。"
         else:
-            additional_guidance = ""
+            guidance = meaning.get("指引", "")
 
         # 流年
         year_ref = get_flowing_year_ref(d, birthday)
@@ -98,8 +97,7 @@ if st.button("🎉 產生日曆建議表"):
             "日期": d.strftime("%Y-%m-%d"),
             "主日數": main_number,
             "主日名稱": meaning.get("名稱", ""),
-            "指引": meaning.get("指引", ""),
-            "補充指引": additional_guidance,
+            "指引": guidance,
             "運勢指數": meaning.get("星", ""),
             "流年": flowing_year,
             "流月": flowing_month,
