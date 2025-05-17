@@ -50,6 +50,34 @@ def get_flowing_month_ref(query_date, birthday):
         return query_date.month - 1 if query_date.month > 1 else 12
     return query_date.month
 
+# ===== 補充指引邏輯 =====
+def get_additional_guidance(flowing_day):
+    main_number = reduce_to_digit(flowing_day)
+
+    # 根據流日的數字組合來調整補充指引
+    if main_number == 5:
+        if flowing_day == 32:  # 流日組合 32/5
+            return "這一天，創意與行動的平衡將帶來新的計畫，準備好啟動變革。"
+        elif flowing_day == 41:  # 流日組合 41/5
+            return "這一天，務實的行動將與創意結合，為新機會打下基礎。"
+    elif main_number == 1:
+        return "今天是展示創意與自我的好時機，讓你吸引更多的目光與機會。"
+    elif main_number == 2:
+        return "今天是適合合作與溝通的日子，耐心等待機會的來臨。"
+    elif main_number == 3:
+        return "自信表達自己的想法，與他人分享你的創意與理念。"
+    elif main_number == 4:
+        return "這一天是規劃與執行的最佳時機，專注細節並做好準備。"
+    elif main_number == 6:
+        return "關注他人需求，今天是營造和諧關係的日子。"
+    elif main_number == 7:
+        return "給自己一些安靜的時間，進行深層的內省與學習。"
+    elif main_number == 8:
+        return "聚焦於目標，今天是行動的最佳時機，邁向成就。"
+    elif main_number == 9:
+        return "放下過去，準備迎接新的階段，療癒自己。"
+    return ""
+
 # ===== Streamlit UI =====
 st.set_page_config(page_title="樂覺製所生命靈數", layout="centered")
 st.title("🧭 樂覺製所生命靈數")
@@ -77,28 +105,11 @@ if st.button("🎉 產生日曆建議表"):
         meaning = day_meaning.get(main_number, {})
         lucky = lucky_map.get(main_number, {})
 
-        # 合併補充指引到主要指引中
-        guidance = meaning.get("指引", "")
+        # 獲取補充指引
+        additional_guidance = get_additional_guidance(fd_total)
 
-        # 添加補充指引
-        if main_number == 5:
-            guidance += " 今天適合平衡創意與行動，啟動新計畫，並帶來積極的變化。"
-        elif main_number == 1:
-            guidance += " 今天是創意的日子，展現自我，啟發他人。"
-        elif main_number == 2:
-            guidance += " 今天適合進行合作與溝通，耐心等待機會的來臨。"
-        elif main_number == 3:
-            guidance += " 展現自信，勇於表達，讓你的聲音被聽見。"
-        elif main_number == 4:
-            guidance += " 今天是規劃和執行的好時機，關注細節，做好準備。"
-        elif main_number == 6:
-            guidance += " 這一天適合處理人際關係，關心他人，營造和諧氛圍。"
-        elif main_number == 7:
-            guidance += " 今天是內省的日子，給自己一些空間來思考和休息。"
-        elif main_number == 8:
-            guidance += " 聚焦於目標，展現決心，並且邁向成就。"
-        elif main_number == 9:
-            guidance += " 今天適合放下過去，療癒自己，並準備迎接新的階段。"
+        # 合併補充指引到主要指引中
+        guidance = meaning.get("指引", "") + " " + additional_guidance
 
         # 流年
         year_ref = get_flowing_year_ref(d, birthday)
