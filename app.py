@@ -3,6 +3,7 @@ import datetime
 import pandas as pd
 from io import BytesIO
 import calendar
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 
 # ===== 主日數與幸運物件資料 =====
 day_meaning = {
@@ -78,6 +79,46 @@ def get_additional_guidance(flowing_day):
         return "放下過去，準備迎接新的階段，療癒自己。"
     return ""
 
+# ===== Excel 優化 =====
+def style_excel(df):
+    # 設定 Excel 優化樣式
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="流年月曆")
+        workbook = writer.book
+        worksheet = workbook["流年月曆"]
+
+        # 設定字型、字體顏色、背景顏色、邊框
+        header_font = Font(size=12, bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        for col in worksheet.columns:
+            max_length = 0
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
+
+        # 設定標題樣式
+        for cell in worksheet[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+
+        # 設定每行的邊框
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),
+                             top=Side(style='thin'), bottom=Side(style='thin'))
+        for row in worksheet.iter_rows():
+            for cell in row:
+                cell.border = thin_border
+
+    return output
+
 # ===== Streamlit UI =====
 st.set_page_config(page_title="樂覺製所生命靈數", layout="centered")
 st.title("🧭 樂覺製所生命靈數")
@@ -141,9 +182,7 @@ if st.button("🎉 產生日曆建議表"):
     subtitle = "在數字之中，我們與自己不期而遇。Be true, be you — 讓靈魂，自在呼吸。"
 
     if not df.empty and df.dropna(how='all').shape[0] > 0:
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df.to_excel(writer, index=False, sheet_name="流年月曆")
+        output = style_excel(df)
         st.markdown(f"### {title}")
         st.markdown(f"**{subtitle}**")
         st.download_button(
