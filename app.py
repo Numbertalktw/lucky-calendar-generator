@@ -78,10 +78,9 @@ if st.button("🎉 產生日曆建議表"):
         lucky = lucky_map.get(main_number, {})
 
         # 合併補充指引到主要指引中
+        guidance = meaning.get("指引", "")
         if main_number == 5:
-            guidance = f"{meaning.get('指引', '')} 根據數字1和數字4的指引，今天可以專注於創意與行動的平衡，為新計畫鋪路。"
-        else:
-            guidance = meaning.get("指引", "")
+            guidance += " 今天適合專注於創意與行動的平衡，為新計畫鋪路。"
 
         # 流年
         year_ref = get_flowing_year_ref(d, birthday)
