@@ -94,16 +94,12 @@ def style_excel(df):
         header_alignment = Alignment(horizontal="center", vertical="center")
 
         # 調整欄位寬度
-        for col in worksheet.columns:
-            max_length = 0
-            for cell in col:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(cell.value)
-                except:
-                    pass
-            adjusted_width = max(max_length + 5, 20)  # 增加最小寬度，防止過小
-            worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
+        column_width = {
+            "流年": 18, "流月": 18, "流日": 18, "運勢指數": 12, "指引": 40, "幸運色": 15, "水晶": 15, "幸運小物": 15
+        }
+
+        for col, width in column_width.items():
+            worksheet.column_dimensions[col[0]].width = width  # 根據字數設置合適的寬度
 
         # 設定標題樣式
         for cell in worksheet[1]:
@@ -117,6 +113,12 @@ def style_excel(df):
         for row in worksheet.iter_rows():
             for cell in row:
                 cell.border = thin_border
+
+        # 調整行高，為每個欄位提供更多空間
+        for row in worksheet.iter_rows():
+            for cell in row:
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            worksheet.row_dimensions[row[0].row].height = 40  # 設定每行高度
 
     return output
 
