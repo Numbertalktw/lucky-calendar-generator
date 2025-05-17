@@ -190,7 +190,7 @@ if st.button("🎉 產生日曆建議表"):
         st.markdown(f"### {title}")
         st.markdown(f"**{subtitle}**")
         st.download_button(
-            "📥 點此下載 " + file_name.replace(".xlsx", " 年靈數流日建議表（三層加總斜線版）"),
+            "📥 點此下載 " + file_name.replace(".xlsx", " 靈數流日建議表"),
             data=output.getvalue(),
             file_name=file_name,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
