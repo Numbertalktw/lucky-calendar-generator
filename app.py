@@ -93,11 +93,12 @@ def style_excel(df):
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
         header_alignment = Alignment(horizontal="center", vertical="center")
 
-        # 調整欄位寬度
+        # 調整欄位寬度，這裡增加了每列的寬度設置，以確保顯示完整
         column_width = {
-            "流年": 18, "流月": 18, "流日": 18, "運勢指數": 12, "指引": 40, "幸運色": 15, "水晶": 15, "幸運小物": 15
+            "流年": 15, "流月": 15, "流日": 15, "運勢指數": 12, "指引": 40, "幸運色": 15, "水晶": 15, "幸運小物": 15
         }
 
+        # 調整每列寬度
         for col, width in column_width.items():
             worksheet.column_dimensions[col[0]].width = width  # 根據字數設置合適的寬度
 
@@ -118,7 +119,7 @@ def style_excel(df):
         for row in worksheet.iter_rows():
             for cell in row:
                 cell.alignment = Alignment(horizontal="center", vertical="center")
-            worksheet.row_dimensions[row[0].row].height = 40  # 設定每行高度
+            worksheet.row_dimensions[row[0].row].height = 35  # 設定每行高度
 
     return output
 
@@ -196,3 +197,4 @@ if st.button("🎉 產生日曆建議表"):
         )
     else:
         st.warning("⚠️ 無法匯出 Excel：目前資料為空，請先產生日曆資料")
+
