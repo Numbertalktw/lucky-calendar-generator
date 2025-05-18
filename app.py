@@ -93,7 +93,7 @@ def style_excel(df):
         header_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
         header_alignment = Alignment(horizontal="center", vertical="center")
 
-        # 調整欄位寬度，將流年、流月、流日、幸運色、水晶、幸運小物調整為 10
+        # 調整欄位寬度，將流年、流月、流日、幸運色、水晶、幸運小物調整為 10，指引調整為 100
         column_width = {
             "流年": 10, "流月": 10, "流日": 10, "運勢指數": 12, "指引": 100, "幸運色": 10, "水晶": 10, "幸運小物": 10
         }
@@ -190,7 +190,7 @@ if st.button("🎉 產生日曆建議表"):
         st.markdown(f"### {title}")
         st.markdown(f"**{subtitle}**")
         st.download_button(
-            "📥 點此下載 " + file_name.replace(".xlsx", " 靈數流日建議表"),
+            "📥 點此下載 " + file_name.replace(".xlsx", " 年靈數流日建議表（三層加總斜線版）"),
             data=output.getvalue(),
             file_name=file_name,
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
